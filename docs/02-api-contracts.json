@@ -1,0 +1,113 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "AI-Powered Stock Portfolio Tool API",
+    "version": "1.0.0",
+    "description": "API for portfolio management, analytics, and AI recommendations."
+  },
+  "servers": [
+    {
+      "url": "https://api.example.com/v1"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "Holding": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "symbol": { "type": "string", "example": "AAPL" },
+          "quantity_x10000": { "type": "integer", "description": "Quantity stored as integer multiplied by 10000 to avoid floating point." },
+          "average_price_cents": { "type": "integer", "description": "Price stored in cents." },
+          "created_at": { "type": "string", "format": "date-time" }
+        },
+        "required": ["symbol", "quantity_x10000", "average_price_cents"]
+      },
+      "Recommendation": {
+        "type": "object",
+        "properties": {
+          "symbol": { "type": "string" },
+          "signal": { "type": "string", "enum": ["Buy", "Hold", "Sell"] },
+          "technical_score": { "type": "integer" },
+          "sentiment_score": { "type": "integer" }
+        }
+      }
+    }
+  },
+  "security": [
+    { "bearerAuth": [] }
+  ],
+  "paths": {
+    "/portfolio/holdings": {
+      "get": {
+        "summary": "List portfolio holdings",
+        "responses": {
+          "200": {
+            "description": "A list of holdings",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Holding" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Add a new holding",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Unique key for idempotent processing."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Holding" }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Holding created" }
+        }
+      }
+    },
+    "/analytics/recommendations/{symbol}": {
+      "get": {
+        "summary": "Get AI recommendation for a symbol",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "symbol",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Recommendation generated",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Recommendation" }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
