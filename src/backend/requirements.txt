@@ -1,0 +1,16 @@
+fastapi
+uvicorn
+sqlalchemy
+pydantic
+python-jose[cryptography]
+passlib[argon2]
+yfinance
+nsepython
+transformers
+torch
+scikit-learn
+pandas
+slowapi
+pydantic-settings
+cachetools
+python-multipart
